@@ -1,0 +1,66 @@
+#! /usr/bin/bash
+
+dest="/home/shahid/DBbackups/"
+archive="/home/shahid/Archives"
+dbuser="root"
+password="P@ssw0rd.7577"
+tag=$(date +%H-%M_%d-%m-%Y)
+
+echo "Database backup started"
+
+mysqldump -u$dbuser -p$password  pacp > $dest/pacp1.sql
+mysqldump -u$dbuser -p$password  pacp > $dest/pacp2.sql
+mysqldump -u$dbuser -p$password  pacp > $dest/pacp3.sql
+mysqldump -u$dbuser -p$password  pacp > $dest/pacp4.sql
+mysqldump -u$dbuser -p$password  pacp > $dest/pacp5.sql
+
+ls -lh  $dest
+echo "Archiving started"
+
+tar -cf $archive/backup_"$tag".tar $dest/
+
+rm $dest/*
+
+echo "archiving completed"
+
+ls -lh $dest
+
+echo "Removing previous backup"
+
+rm $(find  Archives/ -type f -cmin +10)
+
+echo "completed"
+
+# rm $(find $dest -type f -iname "*[3-5].sql")
+
+ls -lh $archive
+
+
+
+
+
+
+#! /usr/bin/bash
+
+dest="/home/shahid/backups/"
+archive="/home/shahid/archives"
+dbuser="root"
+passwd="P@ssw0rd.7577"
+echo "Databses backups started"
+mysqldump -u$dbuser -p$passwd  pacp > $dest/pacp.sql
+mysqldump -u$dbuser -p$passwd  pacp2 > $dest/pacp2.sql
+mysqldump -u$dbuser -p$passwd  phcp1 > $dest/phcp1.sql
+mysqldump -u$dbuser -p$passwd macs > $dest/macs.sql
+
+echo "Backups finished and Archiving started"
+
+tar -cf $archive/backup.tar $dest
+
+echo "Archiving finished"
+
+
+
+
+
+
+find  /home/shahid/ -maxdepth 2 -type f -mtime -3  | wc -l

@@ -1,0 +1,42 @@
+#! /bin/bash
+
+
+##definations
+dest="/home/hisdu/Backups/Backup/"
+# archive="/home/hisdu/Backups/Backup"
+dbuser="root"
+passwd="password"
+tag=$(date +%H-%M_%d-%m-%Y)
+remotedest="/home/hisdu/share/sharename/"
+password="abcd"
+
+
+echo "Database backup started"
+
+clear
+mysqldump -u$dbuser   Dataplug_backup | gzip > $dest/Dataplug_backup_$tag.sql.gz        #1
+mysqldump -u$dbuser   ams | gzip > $dest/ams_$tag.sql.gz                                #2
+# mysqldump -u$dbuser -p$passwd  bmas | gzip > $dest/bmas_$tag.sql.gz                   #3
+mysqldump -u$dbuser  db_cic | gzip > $dest/db_cic_$tag.sql.gz                           #4
+mysqldump -u$dbuser  db_dtl | gzip > $dest/db_dtl_$tag.sql.gz                           #5
+mysqldump -u$dbuser  db_pmonitoring | gzip > $dest/db_pmonitoring_$tag.sql.gz           #6
+mysqldump -u$dbuser  hncct | gzip > $dest/hncct_$tag.sql.gz                             #7
+mysqldump -u$dbuser  nebpedu | gzip > $dest/nebpedu_$tag.sql.gz                         #8
+mysqldump -u$dbuser  nebpedu_sys | gzip > $dest/nebpedu_sys_$tag.sql.gz                 #9
+mysqldump -u$dbuser  tb_emrdhq | gzip > $dest/tb_emrdhq_$tag.sql.gz                     #10
+mysqldump -u$dbuser  phcp | gzip > $dest/phcp_$tag.sql.gz                               #11
+mysqldump -u$dbuser  tb_emrrhc | gzip > $dest/tb_emrrhc_$tag.sql.gz                     #12
+mysqldump -u$dbuser  db_dgme | gzip > $dest/db_dgme_$tag.sql.gz                         #13
+mysqldump -u$dbuser  db_healthwatch | gzip > $dest/db_healthwatch_$tag.sql.gz           #14
+
+
+clear
+echo $password | sudo -S rsync  -r --times --stats  --ignore-existing   $dest/   $remotedest/
+
+clear
+echo $password | sudo -S find $remotedest/ -type f -mtime +7 -exec rm -f {} \;
+
+clear
+rm  $dest/*
+
+echo "Completed"

@@ -1,0 +1,22 @@
+#! /bin/bash
+
+source="/var/www/html"
+archive="/home/hisdu/Backups"
+
+tag=$(date +%H-%M_%d-%m-%Y)
+
+echo "Archiving started"
+
+tar -czf $archive/172.16.0.10_apache_"$tag".tgz -C $source/ .	#Archives skipping complete directory structure
+
+echo "archiving completed"
+
+echo "Removing previous backup Archives"
+
+rm $(find  $archive/ -type f -mtime +2)
+
+# or use this below command both give same results
+# find  $archive/ -type f -mtime +2 -exec rm -f {} \;
+
+echo "completed"
+

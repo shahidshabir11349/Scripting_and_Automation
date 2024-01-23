@@ -1,0 +1,41 @@
+#! /bin/bash
+
+dest="/home/hisdu/Backups/Backup"
+remotedest="/home/hisdu/share/172.16.0.15/"
+# archive="/home/hisdu/Backups/Backup"
+logs="/home/hisdu/Backups/logs"
+dbuser="root"
+passwd="password"
+tag=$(date +%H-%M_%d-%m-%Y)
+password="abcd"
+
+echo "Database backup started"           # > $logs/backup.log
+
+clear
+mysqldump -u$dbuser -p$passwd  db_dgme | gzip > $dest/db_dgme_$tag.sql.gz  #>> $logs/backup.log                         #1
+mysqldump -u$dbuser -p$passwd  db_healthwatch | gzip > $dest/db_healthwatch_$tag.sql.gz #>> $logs/backup.log            #2
+mysqldump -u$dbuser -p$passwd  db_macs | gzip > $dest/db_macs_$tag.sql.gz  #>> $logs/backup.log                         #3
+mysqldump -u$dbuser -p$passwd  db_msh | gzip > $dest/db_msh_$tag.sql.gz  #>> $logs/backup.log                           #4
+mysqldump -u$dbuser -p$passwd  db_mspc | gzip > $dest/db_mspc_$tag.sql.gz #>> $logs/backup.log                          #5
+mysqldump -u$dbuser -p$passwd  db_new_healthwatch | gzip > $dest/db_new_healthwatch_$tag.sql.gz #>> $logs/backup.log    #6
+mysqldump -u$dbuser -p$passwd  db_pmonitoring | gzip > $dest/db_pmonitoring_$tag.sql.gz  #>> $logs/backup.log           #7
+mysqldump -u$dbuser -p$passwd  dgme_live | gzip > $dest/dgme_live_$tag.sql.gz  #>> $logs/backup.log                     #8
+mysqldump -u$dbuser -p$passwd  innodb_memcache | gzip > $dest/innodb_memcache_$tag.sql.gz #>> $logs/backup.log          #9
+mysqldump -u$dbuser -p$passwd  pacp | gzip > $dest/pacp_$tag.sql.gz    #>> $logs/backup.log                            #10
+mysqldump -u$dbuser -p$passwd  phcp | gzip > $dest/phcp_$tag.sql.gz    #>> $logs/backup.log                            #11
+#mysqldump -u$dbuser -p$passwd  bmas | gzip > $dest/bmas_$tag.sql.gz   #>> $logs/backup.log                            #12
+mysqldump -u$dbuser -p$passwd  hisdu_apps | gzip > $dest/hisdu_apps_$tag.sql.gz #>> $logs/backup.log                   #13
+
+clear
+echo $password | sudo -S rsync  -r --times --stats  --ignore-existing   $dest/   $remotedest/
+
+clear
+echo $password | sudo -S find $remotedest/ -type f -mtime +7 -exec rm -f {} \;
+
+clear
+# find $source/ -type f -mtime +1 -exec rm -f {} \;
+
+clear
+rm  $dest/*
+
+echo "Completed"

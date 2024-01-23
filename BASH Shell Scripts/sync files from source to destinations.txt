@@ -1,0 +1,19 @@
+#!  /bin/bash
+
+
+source="/home/hisdu/Backups/Backup"
+
+dest="/home/hisdu/share/Linux_DB_Backups/172.16.6.208/"
+
+password="password"
+
+#moving files to remote server
+echo $password | sudo -S rsync  -r --times --stats  --ignore-existing   $source/   $dest/
+
+#removing old backup files from remote server
+echo $password | sudo -S find $dest/ -type f -mtime +7 -exec rm -f {} \;
+
+#removing old backup files from local server
+find $source/ -type f -mtime +1 -exec rm -f {} \;
+
+echo "completed"

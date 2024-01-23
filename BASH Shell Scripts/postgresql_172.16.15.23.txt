@@ -1,0 +1,34 @@
+#! bin/bash
+
+
+dest="/home/DGHS/Backups/Temp/"
+#archive="/home/hisdu/Backups/Backup"
+remotedest="/home/dghs/share/172.16.15.23"
+dbuser="postgres"
+passwd="abc123@#"
+tag=$(date +%H-%M_%d-%m-%Y)
+
+echo "Database backup started"
+clear
+
+PGPASSWORD=$passwd pg_dump -U$dbuser  dhis_beta | gzip $dest/dhis_beta_$tag.sql.gz			#1
+PGPASSWORD=$passwd pg_dump -U$dbuser  dhispblive | gzip $dest/dhispblive_$tag.sql.gz		#2
+PGPASSWORD=$passwd pg_dump -U$dbuser  lhwdb | gzip $dest/lhwdb_$tag.sql.gz					#3
+PGPASSWORD=$passwd pg_dump -U$dbuser  nutritiondb | gzip $dest/nutritiondb_$tag.sql.gz		#4
+
+
+clear
+echo $password | sudo -S rsync  -r --times --stats  --ignore-existing   $dest/   $remotedest/
+
+clear
+echo $password | sudo -S find $remotedest/ -type f -mtime +7 -exec rm -f {} \;
+
+
+echo "removing temp files"
+clear
+
+rm $dest/*
+
+echo "completed"
+
+

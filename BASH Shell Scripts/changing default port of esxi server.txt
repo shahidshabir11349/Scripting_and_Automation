@@ -1,0 +1,53 @@
+1. enable ssh on esxi host
+2. connect via ssh or press alt + f1 on esxi host
+3. edit this file by command vi /etc/vmware/rhttpproxy/config.xml
+4. find text https by command :/https
+<!-- HTTPS port to be used by the reverse proxy -->
+<httpsPort>443</httpsPort>
+5. change port to eg. 9443 
+(press insert before editing and after finished press esc save it by :wq)
+6. reboot needed by command reboot
+7. after reboot connect to ssh and create new file changedport.xml by command 
+vi /etc/vmware/firewall/changedport.xml
+8. copy this text to console.
+<ConfigRoot>
+  <service>
+    <id>changedport</id>
+    <rule id='0000'>
+      <direction>inbound</direction>
+      <protocol>tcp</protocol>
+      <porttype>dst</porttype>
+      <port>8004</port>
+    </rule>
+    <enabled>true</enabled>
+    <required>false</required>
+  </service>
+</ConfigRoot>
+9. save it by :wq
+10. refresh firewall rules by command esxcli network firewall refresh
+
+
+################### Script ###################
+script to run in esxi server to add port to firewall at startup
+add this script to /etc/rc.local file 
+
+#! /bin/sh
+
+cat <<EOF > /changedport.xml
+<ConfigRoot>
+  <service>
+    <id>changedport</id>
+    <rule id='0000'>
+      <direction>inbound</direction>
+      <protocol>tcp</protocol>
+      <porttype>dst</porttype>
+      <port>8004</port>
+    </rule>
+    <enabled>true</enabled>
+    <required>false</required>
+  </service>
+</ConfigRoot>
+EOF
+
+cp /changedport.xml /etc/vmware/firewall/changedport.xml
+esxcli network firewall refresh
